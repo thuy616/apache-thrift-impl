@@ -1,0 +1,4 @@
+
+service Ping {
+  void ping()
+}

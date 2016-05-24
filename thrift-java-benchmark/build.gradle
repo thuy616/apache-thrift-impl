@@ -1,0 +1,108 @@
+apply plugin: "idea"
+apply plugin: "java"
+apply plugin: "application"
+
+repositories {
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        flatDir {
+            dirs "${projectDir}/libs"
+        }
+        mavenCentral()
+    }
+    dependencies {
+
+    }
+}
+
+dependencies {
+    testCompile "junit:junit:4.12"
+    compile fileTree(dir: "${projectDir}/libs", include: ["*.jar"])
+    compile "com.google.code.gson:gson:2.5"
+    compile "org.slf4j:slf4j-simple:1.7.21"
+//    runtime "ch.qos.logback:logback-core:1.1.7"
+//    runtime "ch.qos.logback:logback-classic:1.1.7"
+}
+
+mainClassName = "thrift.benchmark"
+
+task copyGenJava(type: Copy) {
+    from "${projectDir}/gen-java"
+    into "${projectDir}/src/gen-java"
+}
+
+sourceSets {
+    main {
+        java {
+            // include selfwritten and generated code
+            srcDirs "src/main/java", "${projectDir}/gen-java"
+        }
+    }
+}
+
+task server(type: CreateStartScripts) {
+    mainClassName = "thrift.benchmark.ServerMain"
+    applicationName = "thrift-server"
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = jar.outputs.files + project.configurations.runtime
+}
+
+//task blockingServer(type: CreateStartScripts) {
+//    mainClassName = "thrift.benchmark.BlockingServer"
+//    applicationName = "thrift-blocking-server"
+//    outputDir = new File(project.buildDir, 'tmp')
+//    classpath = jar.outputs.files + project.configurations.runtime
+//}
+
+task blockingClient(type: CreateStartScripts) {
+    mainClassName = "thrift.benchmark.BlockingClient"
+    applicationName = "thrift-blocking-client"
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = jar.outputs.files + project.configurations.runtime
+}
+
+//task nonBlockingServer(type: CreateStartScripts) {
+//    mainClassName = "thrift.benchmark.NonBlockingServer"
+//    applicationName = "thrift-non-blocking-server"
+//    outputDir = new File(project.buildDir, 'tmp')
+//    classpath = jar.outputs.files + project.configurations.runtime
+//}
+
+task nonBlockingClient(type: CreateStartScripts) {
+    mainClassName = "thrift.benchmark.NonBlockingClient"
+    applicationName = "thrift-non-blocking-client"
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = jar.outputs.files + project.configurations.runtime
+}
+
+//task asyncServer(type: CreateStartScripts) {
+//    mainClassName = "thrift.benchmark.AsyncServer"
+//    applicationName = "thrift-async-server"
+//    outputDir = new File(project.buildDir, 'tmp')
+//    classpath = jar.outputs.files + project.configurations.runtime
+//}
+
+task asyncClient(type: CreateStartScripts) {
+    mainClassName = "thrift.benchmark.AsyncClient"
+    applicationName = "thrift-async-client"
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = jar.outputs.files + project.configurations.runtime
+}
+
+applicationDistribution.into("bin") {
+    from(server)
+    from(blockingClient)
+    from(nonBlockingClient)
+    from(asyncClient)
+    fileMode = 0755
+}
+
+// let Intellij include the generated file as source folders
+idea {
+    module {
+        sourceDirs += file("${projectDir}/gen-java");
+    }
+}

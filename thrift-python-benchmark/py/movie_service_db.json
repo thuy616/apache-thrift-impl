@@ -897,7 +897,7 @@
       "spoken_languages": [
         {
           "iso_639_1": "es",
-          "name": "Español"
+          "name": "Espanol"
         }
       ],
       "status": "Post Production",
@@ -1135,7 +1135,7 @@
       "poster_path": "/iCzrCEjnWhPw4fmPgO4cN6KEU8X.jpg",
       "production_companies": [
         {
-          "name": "UIP Türkiye",
+          "name": "UIP Turkiye",
           "id": 69828
         }
       ],
@@ -1270,74 +1270,6 @@
       "video": false,
       "vote_average": 8.3,
       "vote_count": 4832
-    },
-    {
-      "adult": false,
-      "backdrop_path": "/6xKCYgH16UuwEGAyroLU6p8HLIn.jpg",
-      "belongs_to_collection": {
-        "id": 230,
-        "name": "The Godfather Collection",
-        "poster_path": "/7SJVjEDoo7xH62TS8stkqRk4Byo.jpg",
-        "backdrop_path": "/3WZTxpgscsmoUk81TuECXdFOD0R.jpg"
-      },
-      "budget": 6000000,
-      "genres": [
-        {
-          "id": 18,
-          "name": "Drama"
-        },
-        {
-          "id": 80,
-          "name": "Crime"
-        }
-      ],
-      "homepage": "http://www.thegodfather.com/",
-      "id": 238,
-      "imdb_id": "tt0068646",
-      "original_language": "en",
-      "original_title": "The Godfather",
-      "overview": "The story spans the years from 1945 to 1955 and chronicles the fictional Italian-American Corleone crime family. When organized crime family patriarch Vito Corleone barely survives an attempt on his life, his youngest son, Michael, steps in to take care of the would-be killers, launching a campaign of bloody revenge.",
-      "popularity": 4.6318,
-      "poster_path": "/d4KNaTrltq6bpkFS01pYtyXa09m.jpg",
-      "production_companies": [
-        {
-          "name": "Paramount Pictures",
-          "id": 4
-        },
-        {
-          "name": "Alfran Productions",
-          "id": 10211
-        }
-      ],
-      "production_countries": [
-        {
-          "iso_3166_1": "US",
-          "name": "United States of America"
-        }
-      ],
-      "release_date": "1972-03-15",
-      "revenue": 245066411,
-      "runtime": 175,
-      "spoken_languages": [
-        {
-          "iso_639_1": "en",
-          "name": "English"
-        },
-        {
-          "iso_639_1": "it",
-          "name": "Italiano"
-        },
-        {
-          "iso_639_1": "la",
-          "name": "Latin"
-        }
-      ],
-      "status": "Released",
-      "tagline": "An offer you can't refuse.",
-      "title": "The Godfather",
-      "video": false,
-      "vote_average": 8.2,
-      "vote_count": 3270
     },
     {
       "adult": false,
@@ -1625,78 +1557,6 @@
     },
     {
       "adult": false,
-      "backdrop_path": "/gLbBRyS7MBrmVUNce91Hmx9vzqI.jpg",
-      "belongs_to_collection": {
-        "id": 230,
-        "name": "The Godfather Collection",
-        "poster_path": "/7SJVjEDoo7xH62TS8stkqRk4Byo.jpg",
-        "backdrop_path": "/3WZTxpgscsmoUk81TuECXdFOD0R.jpg"
-      },
-      "budget": 13000000,
-      "genres": [
-        {
-          "id": 18,
-          "name": "Drama"
-        },
-        {
-          "id": 80,
-          "name": "Crime"
-        }
-      ],
-      "homepage": "",
-      "id": 240,
-      "imdb_id": "tt0071562",
-      "original_language": "en",
-      "original_title": "The Godfather: Part II",
-      "overview": "The continuing saga of the Corleone crime family tells the story of a young Vito Corleone growing up in Sicily and in 1910s New York; and follows Michael Corleone in the 1950s as he attempts to expand the family business into Las Vegas, Hollywood and Cuba",
-      "popularity": 3.001103,
-      "poster_path": "/tHbMIIF51rguMNSastqoQwR0sBs.jpg",
-      "production_companies": [
-        {
-          "name": "Paramount Pictures",
-          "id": 4
-        },
-        {
-          "name": "The Coppola Company",
-          "id": 536
-        }
-      ],
-      "production_countries": [
-        {
-          "iso_3166_1": "US",
-          "name": "United States of America"
-        }
-      ],
-      "release_date": "1974-12-20",
-      "revenue": 47542841,
-      "runtime": 200,
-      "spoken_languages": [
-        {
-          "iso_639_1": "en",
-          "name": "English"
-        },
-        {
-          "iso_639_1": "it",
-          "name": "Italiano"
-        },
-        {
-          "iso_639_1": "la",
-          "name": "Latin"
-        },
-        {
-          "iso_639_1": "es",
-          "name": "Espaol"
-        }
-      ],
-      "status": "Released",
-      "tagline": "I don't feel I have to wipe everybody out, Tom. Just my enemies.",
-      "title": "The Godfather: Part II",
-      "video": false,
-      "vote_average": 8.1,
-      "vote_count": 1730
-    },
-    {
-      "adult": false,
       "backdrop_path": "/fCUIuG7y4YKC3hofZ8wsj7zhCpR.jpg",
       "belongs_to_collection": null,
       "budget": 0,
@@ -1748,7 +1608,7 @@
       "spoken_languages": [
         {
           "iso_639_1": "fr",
-          "name": "Franais"
+          "name": "Francais"
         },
         {
           "iso_639_1": "ja",
@@ -1781,7 +1641,7 @@
       "id": 637,
       "imdb_id": "tt0118799",
       "original_language": "it",
-      "original_title": "La vita è bella",
+      "original_title": "La vita e bella",
       "overview": "A touching story of an Italian book seller of Jewish ancestry who lives in his own little fairy tale. His creative and happy life would come to an abrupt halt when his entire family is deported to a concentration camp during World War II. While locked up he tries to convince his son that the whole thing is just a game.",
       "popularity": 2.883213,
       "poster_path": "/f7DImXDebOs148U4uPjI61iDvaK.jpg",
@@ -2251,11 +2111,11 @@
         },
         {
           "iso_639_1": "es",
-          "name": "Espaol"
+          "name": "Espanol"
         },
         {
           "iso_639_1": "fr",
-          "name": "Franais"
+          "name": "Francais"
         }
       ],
       "status": "Released",
@@ -2264,6 +2124,146 @@
       "video": false,
       "vote_average": 8,
       "vote_count": 4360
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/6xKCYgH16UuwEGAyroLU6p8HLIn.jpg",
+      "belongs_to_collection": {
+        "id": 230,
+        "name": "The Godfather Collection",
+        "poster_path": "/7SJVjEDoo7xH62TS8stkqRk4Byo.jpg",
+        "backdrop_path": "/3WZTxpgscsmoUk81TuECXdFOD0R.jpg"
+      },
+      "budget": 6000000,
+      "genres": [
+        {
+          "id": 18,
+          "name": "Drama"
+        },
+        {
+          "id": 80,
+          "name": "Crime"
+        }
+      ],
+      "homepage": "http://www.thegodfather.com/",
+      "id": 238,
+      "imdb_id": "tt0068646",
+      "original_language": "en",
+      "original_title": "The Godfather",
+      "overview": "The story spans the years from 1945 to 1955 and chronicles the fictional Italian-American Corleone crime family. When organized crime family patriarch Vito Corleone barely survives an attempt on his life, his youngest son, Michael, steps in to take care of the would-be killers, launching a campaign of bloody revenge.",
+      "popularity": 4.6318,
+      "poster_path": "/d4KNaTrltq6bpkFS01pYtyXa09m.jpg",
+      "production_companies": [
+        {
+          "name": "Paramount Pictures",
+          "id": 4
+        },
+        {
+          "name": "Alfran Productions",
+          "id": 10211
+        }
+      ],
+      "production_countries": [
+        {
+          "iso_3166_1": "US",
+          "name": "United States of America"
+        }
+      ],
+      "release_date": "1972-03-15",
+      "revenue": 245066411,
+      "runtime": 175,
+      "spoken_languages": [
+        {
+          "iso_639_1": "en",
+          "name": "English"
+        },
+        {
+          "iso_639_1": "it",
+          "name": "Italiano"
+        },
+        {
+          "iso_639_1": "la",
+          "name": "Latin"
+        }
+      ],
+      "status": "Released",
+      "tagline": "An offer you can't refuse.",
+      "title": "The Godfather",
+      "video": false,
+      "vote_average": 8.2,
+      "vote_count": 3270
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/gLbBRyS7MBrmVUNce91Hmx9vzqI.jpg",
+      "belongs_to_collection": {
+        "id": 230,
+        "name": "The Godfather Collection",
+        "poster_path": "/7SJVjEDoo7xH62TS8stkqRk4Byo.jpg",
+        "backdrop_path": "/3WZTxpgscsmoUk81TuECXdFOD0R.jpg"
+      },
+      "budget": 13000000,
+      "genres": [
+        {
+          "id": 18,
+          "name": "Drama"
+        },
+        {
+          "id": 80,
+          "name": "Crime"
+        }
+      ],
+      "homepage": "",
+      "id": 240,
+      "imdb_id": "tt0071562",
+      "original_language": "en",
+      "original_title": "The Godfather: Part II",
+      "overview": "The continuing saga of the Corleone crime family tells the story of a young Vito Corleone growing up in Sicily and in 1910s New York; and follows Michael Corleone in the 1950s as he attempts to expand the family business into Las Vegas, Hollywood and Cuba",
+      "popularity": 3.001103,
+      "poster_path": "/tHbMIIF51rguMNSastqoQwR0sBs.jpg",
+      "production_companies": [
+        {
+          "name": "Paramount Pictures",
+          "id": 4
+        },
+        {
+          "name": "The Coppola Company",
+          "id": 536
+        }
+      ],
+      "production_countries": [
+        {
+          "iso_3166_1": "US",
+          "name": "United States of America"
+        }
+      ],
+      "release_date": "1974-12-20",
+      "revenue": 47542841,
+      "runtime": 200,
+      "spoken_languages": [
+        {
+          "iso_639_1": "en",
+          "name": "English"
+        },
+        {
+          "iso_639_1": "it",
+          "name": "Italiano"
+        },
+        {
+          "iso_639_1": "la",
+          "name": "Latin"
+        },
+        {
+          "iso_639_1": "es",
+          "name": "Espanol"
+        }
+      ],
+      "status": "Released",
+      "tagline": "I don't feel I have to wipe everybody out, Tom. Just my enemies.",
+      "title": "The Godfather: Part II",
+      "video": false,
+      "vote_average": 8.1,
+      "vote_count": 1730
     }
   ]
 }

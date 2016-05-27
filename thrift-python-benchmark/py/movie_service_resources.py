@@ -9,9 +9,9 @@ sys.path.append('gen-py')
 
 def read_movie_service_database():
     movies_list = []
-    movies = Movies(
-        movies=[]
-    )
+    # movies = Movies(
+    #     movies=[]
+    # )
     with open("movie_service_db.json", "rb") as data:
         for item in json.load(data)["movies"]:
 
@@ -83,9 +83,9 @@ def read_movie_service_database():
                 )
 
             movies_list.append(movie)
-            movies.movies.append(movie)
+            # movies.movies.append(movie)
 
         print("Finish loading data...")
         data.close()
 
-    return movies
+    return movies_list

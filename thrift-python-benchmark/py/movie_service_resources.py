@@ -1,15 +1,17 @@
 import json
 import sys
+from movieservice.ttypes import *
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
 sys.path.append('gen-py')
 
-from movieservice.ttypes import *
-
 
 def read_movie_service_database():
     movies_list = []
+    movies = Movies(
+        movies=[]
+    )
     with open("movie_service_db.json", "rb") as data:
         for item in json.load(data)["movies"]:
 
@@ -81,8 +83,9 @@ def read_movie_service_database():
                 )
 
             movies_list.append(movie)
+            movies.movies.append(movie)
 
         print("Finish loading data...")
         data.close()
 
-    return movies_list
+    return movies

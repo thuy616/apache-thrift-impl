@@ -1,16 +1,11 @@
-import sys
-
 from thrift.transport.TTransport import TMemoryBuffer
-
-sys.path.append('gen-py')
-
-from movieservice import MovieService
-from ping import Ping
 
 from thrift import Thrift
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
+
+from movieservice import MovieService
 
 
 def main():
@@ -39,19 +34,6 @@ def main():
         re = client.getMovies();
         print ("getMovies succeeded!")
         print ("Result: " + str(re))
-
-        transport_out = TMemoryBuffer()
-        protocol_out = TBinaryProtocol(transport_out)
-        re.write(protocol_out)
-        bytes = transport_out.getvalue()
-        print("bytes len: " + len(bytes))
-
-        # transport_in = TMemoryBuffer(serializedData)
-        # protocol_in = TBinaryProtocol(transport_in)
-        # movie_list = Movies()
-        # movie_list.read(protocol_in)
-        # print("deserializatime time: ")
-
 
     except Exception as e:
         print("!@*^@!*^$")

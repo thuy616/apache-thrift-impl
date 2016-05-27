@@ -1,17 +1,15 @@
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 import movie_service_impl
 import logging
-
-from movieservice import MovieService
-from ping import Ping
 
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
+from movieservice import MovieService
 
 class PingHandler:
     def __init__(self):

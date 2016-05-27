@@ -6,3 +6,4 @@ thrift-java-benchmark/build/*
 thrift-java-benchmark/Logging/*
 thrift-java-benchmark/.gradle
 /**/*.log
+**/*.pyc

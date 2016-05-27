@@ -1,11 +1,10 @@
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 from thrift.transport.TTransport import TMemoryBuffer
 from thrift.protocol import TBinaryProtocol
 import movie_service_resources
 from movieservice.ttypes import *
-from shared.ttypes import SharedStruct
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 
 class MovieServiceHandler:

@@ -50,26 +50,12 @@ task server(type: CreateStartScripts) {
     classpath = jar.outputs.files + project.configurations.runtime
 }
 
-//task blockingServer(type: CreateStartScripts) {
-//    mainClassName = "thrift.benchmark.BlockingServer"
-//    applicationName = "thrift-blocking-server"
-//    outputDir = new File(project.buildDir, 'tmp')
-//    classpath = jar.outputs.files + project.configurations.runtime
-//}
-
 task blockingClient(type: CreateStartScripts) {
     mainClassName = "thrift.benchmark.BlockingClient"
     applicationName = "thrift-blocking-client"
     outputDir = new File(project.buildDir, 'tmp')
     classpath = jar.outputs.files + project.configurations.runtime
 }
-
-//task nonBlockingServer(type: CreateStartScripts) {
-//    mainClassName = "thrift.benchmark.NonBlockingServer"
-//    applicationName = "thrift-non-blocking-server"
-//    outputDir = new File(project.buildDir, 'tmp')
-//    classpath = jar.outputs.files + project.configurations.runtime
-//}
 
 task nonBlockingClient(type: CreateStartScripts) {
     mainClassName = "thrift.benchmark.NonBlockingClient"
@@ -78,16 +64,16 @@ task nonBlockingClient(type: CreateStartScripts) {
     classpath = jar.outputs.files + project.configurations.runtime
 }
 
-//task asyncServer(type: CreateStartScripts) {
-//    mainClassName = "thrift.benchmark.AsyncServer"
-//    applicationName = "thrift-async-server"
-//    outputDir = new File(project.buildDir, 'tmp')
-//    classpath = jar.outputs.files + project.configurations.runtime
-//}
-
 task asyncClient(type: CreateStartScripts) {
     mainClassName = "thrift.benchmark.AsyncClient"
     applicationName = "thrift-async-client"
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = jar.outputs.files + project.configurations.runtime
+}
+
+task serializationTest(type: CreateStartScripts) {
+    mainClassName = "thrift.benchmark.SerializationTest"
+    applicationName = "serialization-test"
     outputDir = new File(project.buildDir, 'tmp')
     classpath = jar.outputs.files + project.configurations.runtime
 }
@@ -97,6 +83,7 @@ applicationDistribution.into("bin") {
     from(blockingClient)
     from(nonBlockingClient)
     from(asyncClient)
+    from(serializationTest)
     fileMode = 0755
 }
 

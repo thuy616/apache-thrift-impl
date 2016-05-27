@@ -1,14 +1,10 @@
 package thrift.benchmark;
 
-import movieservice.Movie;
 import movieservice.MovieService;
-import movieservice.MovieService.AsyncClient.getMovieList_call;
-
 import movieservice.Movies;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.AsyncMethodCallback;
 import org.apache.thrift.async.TAsyncClientManager;
-import org.apache.thrift.async.TAsyncMethodCall;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TNonblockingSocket;
 
@@ -17,9 +13,9 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;

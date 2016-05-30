@@ -4,6 +4,7 @@ import movieservice.MovieService;
 import movieservice.Movies;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
+import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
@@ -37,11 +38,13 @@ public class BlockingServer {
         handler = new MovieServiceImpl(moviesData);
         processor = new MovieService.Processor(handler);
         TServerTransport serverTransport = new TServerSocket(port);
-        server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport)
-                .processor(processor)
-                .protocolFactory(new TBinaryProtocol.Factory())
-                .minWorkerThreads(4)
-                .maxWorkerThreads(64));
+//        server = new TSimpleServer(new TServer.Args(serverTransport).processor(processor));
+        server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
+//        server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport)
+//                .processor(processor)
+//                .protocolFactory(new TBinaryProtocol.Factory())
+//                .minWorkerThreads(4)
+//                .maxWorkerThreads(64));
 
         SimpleDateFormat format = new SimpleDateFormat("MM_dd_yyyy_HHmmss");
         try {

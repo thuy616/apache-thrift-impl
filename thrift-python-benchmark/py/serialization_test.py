@@ -42,7 +42,6 @@ class SerializationTest:
         self.logger.log(logging.INFO, "initializing completed...")
 
     def run_tbinary(self):
-
         total_ser = 0
         total_deser = 0
         serialized_len = 0

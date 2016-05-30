@@ -13,6 +13,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Scanner;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,11 +25,12 @@ import java.util.logging.SimpleFormatter;
 public class BlockingClient {
     private static final java.util.logging.Logger logger = Logger.getLogger(BlockingClient.class.getName());
     private FileHandler fh;
+    private TTransport transport;
 
     public BlockingClient() {
         SimpleDateFormat format = new SimpleDateFormat("MM_dd_yyyy_HHmmss");
         try {
-            String dir = Paths.get("").toAbsolutePath().toString() + "//Logging";
+            String dir = Paths.get("").toAbsolutePath().toString() + "//Logging//Thrift";
             File directory = new File(dir);
 
             if (!directory.exists()) {
@@ -46,8 +48,8 @@ public class BlockingClient {
         logger.addHandler(fh);
     }
 
-    private void invoke() {
-        TTransport transport;
+    private void invoke(int iterations) {
+
 
         try {
             int port = 9090;
@@ -58,10 +60,10 @@ public class BlockingClient {
             MovieService.Client client = new MovieService.Client(protocol);
             transport.open();
 
-            getMovies(client, 1);
-            getMovies(client, 1000);
-            getMovies(client, 10000);
-            getMovies(client, 100000);
+            getMovies(client, 1, iterations);
+            getMovies(client, 1000, iterations);
+            getMovies(client, 10000, iterations);
+            getMovies(client, 100000, iterations);
 
             transport.close();
 
@@ -72,32 +74,37 @@ public class BlockingClient {
         }
     }
 
-    private Movies getMovies(MovieService.Client client, int count) throws TException {
-        Movies result = null;
-        logger.info("#### BLOCKING REQUEST ####  " + count + " CALLS ####");
-        long start = System.nanoTime();
-        for (int i = 0; i < count; i++) {
-            result = client.getMovies();
+    private void shutdown() {
+        transport.close();
+    }
+
+    private void getMovies(MovieService.Client client, int count, int iterations) throws TException {
+        info("#### BLOCKING REQUEST ####  {0} CALLS ####", count);
+        long totalElapsed = 0;
+        for (int j=0; j<iterations; j++) {
+            info("=========== ITERATION {0} ==============", j);
+            long start = System.nanoTime();
+            for (int i = 0; i < count; i++) {
+                Movies result = client.getMovies();
+            }
+            long end = System.nanoTime();
+            long duration = end - start;
+            totalElapsed += duration;
+            logTransmissionTime(duration);
         }
-        long end = System.nanoTime();
-        long duration = end - start;
-        logTransmissionTime(duration);
-        return result;
+        info("AVERAGE transmission time: {0}", totalElapsed/(float)iterations);
     }
 
     public static void main(String[] args) {
         BlockingClient client = new BlockingClient();
-        client.runTestIteration(10);
-    }
-
-    public void runTestIteration(int iteration) {
-        for (int i = 0; i < iteration; i++) {
-            info("***********************   ITERATION {0}   ***********************", i);
-            info("           START           ");
-            invoke();
+        Scanner scanner = new Scanner(System.in);
+        while(scanner.nextLine()!="q") {
+            System.out.println("Press q to quit. Press any other key to continue...");
+            client.invoke(10);
         }
-
+        client.shutdown();
     }
+
 
     private static void info(String msg, Object... params) {
         logger.log(Level.INFO, msg, params);

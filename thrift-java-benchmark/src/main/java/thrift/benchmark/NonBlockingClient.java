@@ -14,6 +14,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Scanner;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,14 +32,14 @@ public class NonBlockingClient {
 
     public NonBlockingClient(int port) throws TTransportException {
 
-        this.port = 9091;
+        this.port = 9090;
 
         // difference here
         // TFramedTransport wrapping normal TSocket transport.
         // Non blocking server requires client to use TFramedTransport which would frame
         // the data sent over the wire. Fire up the server and send a request using the client.
         // You will see the same results as before, this time using non blocking mode.
-        transport = new TFramedTransport(new TSocket("localhost", this.port));
+        transport = new TFramedTransport(new TSocket("127.0.0.1", this.port));
 
         TProtocol protocol = new TBinaryProtocol(transport);
 
@@ -65,34 +66,14 @@ public class NonBlockingClient {
         logger.addHandler(fh);
     }
 
-    private void invoke() {
+    private void invoke(int iterations) {
 
         try {
-            Movies result = client.getMovies();
 
-            // test Tserializer
-            info("$$$ TEST TSERIALIZER $$$");
-            TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-            long startSer = System.nanoTime();
-            byte[] serializedData = serializer.serialize(result);
-            long endSer = System.nanoTime();
-            info("Serialized length: {0} bytes", serializedData.length);
-            info("Serialized time: {0} nanoseconds", endSer - startSer);
-
-            // test TDeserializer
-            info("$$$ TEST TDESERIALIZER $$$");
-            TDeserializer deser = new TDeserializer(new TBinaryProtocol.Factory());
-            Movies deserializedMovies = new Movies();
-            long startDeser = System.nanoTime();
-            deser.deserialize(deserializedMovies, serializedData);
-            long endDeser = System.nanoTime();
-            info("De-Serialized time: {0} nanoseconds", endDeser - startDeser);
-
-
-            getMovies(client, 1);
-            getMovies(client, 1000);
-            getMovies(client, 10000);
-            getMovies(client, 100000);
+            getMovies(client, 1, iterations);
+//            getMovies(client, 1000, iterations);
+//            getMovies(client, 10000, iterations);
+//            getMovies(client, 100000, iterations);
 
 
         } catch (TTransportException e) {
@@ -107,17 +88,22 @@ public class NonBlockingClient {
         transport.close();
     }
 
-    private Movies getMovies(MovieService.Client client, int count) throws TException {
-        logger.info("#### NON BLOCKING REQUEST ####  " + count + " CALLS ####");
-        Movies result = null;
-        long start = System.nanoTime();
-        for (int i = 0; i < count; i++) {
-            result = client.getMovies();
+    private void getMovies(MovieService.Client client, int count, int iterations) throws TException {
+        info("#### NON BLOCKING REQUEST ####  " + count + " CALLS ####");
+        long totalElapsed = 0;
+
+        for (int j=0; j<iterations; j++) {
+            info("=========== ITERATION {0} ==============", j);
+            long start = System.nanoTime();
+            for (int i = 0; i < count; i++) {
+                Movies result = client.getMovies();
+            }
+            long end = System.nanoTime();
+            long duration = end - start;
+            logTransmissionTime(duration);
+            totalElapsed += duration;
         }
-        long end = System.nanoTime();
-        long duration = end - start;
-        logTransmissionTime(duration);
-        return result;
+        info("AVERAGE transmission time: {0}", totalElapsed/(float)iterations);
     }
 
     public static void main(String[] args) {
@@ -128,17 +114,12 @@ public class NonBlockingClient {
             e.printStackTrace();
             logger.log(Level.SEVERE, "Failed to initialize client - ", e);
         }
-        client.runTestIteration(10);
-        client.shutdown();
-    }
-
-    public void runTestIteration(int iteration) {
-        for (int i = 0; i < iteration; i++) {
-            info("***********************   ITERATION {0}   ***********************", i);
-            info("           START           ");
-            invoke();
+        Scanner scanner = new Scanner(System.in);
+        while(scanner.nextLine()!="q") {
+            System.out.println("Press q to quit. Press any other key to continue...");
+            client.invoke(1);
         }
-
+        client.shutdown();
     }
 
     private static void info(String msg, Object... params) {

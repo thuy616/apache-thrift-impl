@@ -3,6 +3,7 @@ package thrift.benchmark;
 import movieservice.MovieService;
 import movieservice.Movies;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.server.THsHaServer;
 import org.apache.thrift.server.TNonblockingServer;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
@@ -38,7 +39,7 @@ public class NonBlockingServer {
         processor = new MovieService.Processor(handler);
         try {
             TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(port);
-            server = new TNonblockingServer(new TNonblockingServer.Args(serverTransport).
+            server = new THsHaServer(new THsHaServer.Args(serverTransport).
                     processor(processor));
 
             SimpleDateFormat format = new SimpleDateFormat("MM_dd_yyyy_HHmmss");

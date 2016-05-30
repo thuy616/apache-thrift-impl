@@ -7,6 +7,7 @@ import org.apache.thrift.async.AsyncMethodCallback;
 import org.apache.thrift.async.TAsyncClientManager;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TNonblockingSocket;
+import org.apache.thrift.transport.TTransportException;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +15,8 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,43 +32,49 @@ public class AsyncClient {
     private FileHandler fh;
     private TNonblockingSocket transportSocket;
     private TAsyncClientManager asyncClientManager;
-    private MovieService.AsyncClient asyncClient;
-
+    private static MovieService.AsyncClient asyncClient;
     public ExecutorService executor;
-
-    private int count;
-    private static int counter = 0;
-
-    private static long start;
-    private static long end;
+    private static AtomicInteger counter = new AtomicInteger(0);
 
     //Class template supporting async wait and timeout
-//    private static abstract class WaitableCallback<T>
-//            implements AsyncMethodCallback<T> {
-//
-//        private CountDownLatch latch = new CountDownLatch(1);
-//
-//        //Synchronization Interface
-//        public void reset() { latch = new CountDownLatch(1); }
-//        public void complete() { latch.countDown(); }
-//        public boolean wait(int i) {
-//            boolean b = false;
-//            try { b = latch.await(i, TimeUnit.MILLISECONDS); }
-//            catch(Exception e) { System.out.println("[Client] await error"); }
-//            return b;
-//        }
-//
-//        //AsyncMethodCallback<T> interface
-//        @Override
-//        public void onError(Exception ex) {
-//            if (ex instanceof TimeoutException) {
-//                System.out.println("[Client] Async call timed out");
-//            } else {
-//                System.out.println("[Client] Async call error");
-//            }
-//            complete();
-//        }
-//    }
+    private static abstract class WaitableCallback<T>
+            implements AsyncMethodCallback<T> {
+
+        private CountDownLatch latch = new CountDownLatch(1);
+
+        //Synchronization Interface
+        public void reset() {
+            latch = new CountDownLatch(1);
+        }
+
+        public void complete() {
+//            System.out.println("Callback received result #" + counter.get());
+
+            latch.countDown();
+        }
+
+        public boolean wait(int i) {
+            boolean b = false;
+            try {
+                b = latch.await(i, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {
+                System.out.println("[Client] await error");
+            }
+            return b;
+        }
+
+        //AsyncMethodCallback<T> interface
+        @Override
+        public void onError(Exception ex) {
+            if (ex instanceof TimeoutException) {
+                System.out.println("[Client] Async call timed out");
+            } else {
+                System.out.println("[Client] Async call error");
+                ex.printStackTrace();
+            }
+            complete();
+        }
+    }
 
 
     private class GetMoviesMethodCallback implements AsyncMethodCallback<Movies> {
@@ -78,8 +85,7 @@ public class AsyncClient {
 
             try {
                 Movies re = getMovies_call;
-                counter++;
-                info("received result #{}", counter);
+                info("!!!!!!!!callback oncomplete invoked...");
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "error", e);
             }
@@ -92,13 +98,12 @@ public class AsyncClient {
         }
     }
 
-    public AsyncClient(int port, int count) throws IOException {
-        this.count = count;
-        transportSocket = new TNonblockingSocket("localhost", port);
+    public AsyncClient(int port) throws IOException {
+        transportSocket = new TNonblockingSocket("127.0.0.1", port);
         asyncClientManager = new TAsyncClientManager();
         asyncClient = new MovieService.AsyncClient(new TBinaryProtocol.Factory(), asyncClientManager, transportSocket);
 
-        executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newFixedThreadPool(200);
 
         SimpleDateFormat format = new SimpleDateFormat("MM_dd_yyyy_HHmmss");
         try {
@@ -117,48 +122,54 @@ public class AsyncClient {
 
         fh.setFormatter(new SimpleFormatter());
         fh.setLevel(Level.INFO);
+//        logger.setUseParentHandlers(false);
         logger.addHandler(fh);
-
     }
 
 
-    public void invoke() throws TException {
-        info("Number of requests: {0}", count);
-        start = System.nanoTime();
-
-        for (int i=0; i<count; i++) {
-//            //get_last_sale() async callback handler
-//            WaitableCallback<Movies> callback =
-//                    new WaitableCallback<Movies>() {
-//
-//                        @Override
-//                        public void onComplete(Movies res) {
-//                            try {
-//                                counter++;
-//                                info("received result #{0}", counter);
-//                            } catch (Exception e) {
-//                                logger.log(Level.SEVERE, "EXCEPTION", e);
-//                            } finally {
-//                                complete();
-//                            }
-//                        }
-//                    };
-
+    public void invoke(int count) throws TException {
+        long start = System.nanoTime();
+        for (int i = 0; i < count; i++) {
             Runnable task = new Runnable() {
                 public void run() { // Where the "do the call" code sits
+
                     try {
-                        asyncClient.getMovies(new GetMoviesMethodCallback());
+//                        asyncClient.getMovies(new GetMoviesMethodCallback());
+                        WaitableCallback<Movies> callback =
+                                new WaitableCallback<Movies>() {
+
+                                    @Override
+                                    public void onComplete(Movies res) {
+                                        try {
+                                            // consume result from callback
+                                            info("onComplete: received result for task: " + counter.incrementAndGet());
+                                        } catch (Exception e) {
+                                            logger.log(Level.SEVERE, "EXCEPTION", e);
+                                        } finally {
+                                            complete();
+                                        }
+                                    }
+                                };
+                        // make async call
+//                        callback.reset();
+                        asyncClient.getMovies(callback);
+//                        info("Client getMovies() executes async");
+//                        callback.wait(500);
                     } catch (TException e) {
                         e.printStackTrace();
                     }
                 }
+
             };
-            info("Task {0} submitted", i);
-            executor.submit(task); // This scheduled the runnable to be run
-
+            executor.submit(task);
+            System.out.println("Task submitted #" + i);
         }
-    }
+        long end = System.nanoTime();
+        long submissionTime = end - start;
+        logTransmissionTime(count, submissionTime);
 
+        // wait for all futures to complete before sending new sets of request
+    }
 
     public void shutdown() {
         info("Shutting down...");
@@ -170,39 +181,39 @@ public class AsyncClient {
         logger.log(Level.INFO, msg, params);
     }
 
-    private static void logTransmissionTime(long value) {
-        info("Transmission time: {0} nanoseconds ===== {1} milliseconds ", value, value / (double) 1000000);
+    private static void logTransmissionTime(int count, long value) {
+        info("Request submission time for {0} calls: {1} ", count, value);
 
     }
 
     public static void main(String[] args) {
-        int port = 9092; // use with async server
-        Scanner scanner = new Scanner(System.in);
-        int count = 1000;
-
+        int port = 9090; // use with non-blocking server
+        AsyncClient client = null;
         try {
-            AsyncClient client = new AsyncClient(port, count);
-
-            info("TESTING");
-            client.invoke();
-            while (counter<count) {
-                info("... progress current counter: {0} == {1}%", counter, (counter*100)/(float)count);
-            }
-            if (counter==count-1) {
-                info("All tasks completed!");
-                end = System.nanoTime();
-                logTransmissionTime(end - start);
-            }
-
+            client = new AsyncClient(port);
         } catch (IOException e) {
             e.printStackTrace();
-            logger.log(Level.SEVERE, "IOException", e);
-        } catch (TException e) {
-            e.printStackTrace();
-            logger.log(Level.SEVERE, "TException", e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.log(Level.SEVERE, "Unknown general Exception", e);
+        }
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Press any key to continue.. q to quit...");
+        while (scanner.nextLine() != "q") {
+            System.out.println("Number of calls:");
+            int count = scanner.nextInt();
+
+            try {
+
+                info("TESTING");
+//                client.invoke(count);
+                client.invoke(count);
+
+
+            } catch (TException e) {
+                e.printStackTrace();
+                logger.log(Level.SEVERE, "TException", e);
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.log(Level.SEVERE, "Unknown general Exception", e);
+            }
         }
 
     }

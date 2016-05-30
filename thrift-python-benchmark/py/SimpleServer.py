@@ -5,7 +5,9 @@ import logging
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
+from thrift.protocol.TBinaryProtocol import TBinaryProtocolAccelerated
 from thrift.server import TServer
+from thrift.server import TNonblockingServer
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -44,8 +46,9 @@ if __name__ == '__main__':
     # processor = Ping.Processor(handler)
     transport = TSocket.TServerSocket(port=9090)
     tfactory = TTransport.TBufferedTransportFactory()
-    pfactory = TBinaryProtocol.TBinaryProtocolFactory()
+    pfactory = TBinaryProtocol.TBinaryProtocolAcceleratedFactory()
     server = TServer.TSimpleServer(processor, transport, tfactory, pfactory)
+    # server = TNonblockingServer.TNonblockingServer(processor, transport, tfactory, pfactory)
 
     # You could do one of these for a multithreaded server
     # server = TServer.TThreadedServer(

@@ -61,8 +61,11 @@ public class BlockingClient {
             transport.open();
 
             getMovies(client, 1, iterations);
+            Thread.sleep(30*1000);
             getMovies(client, 1000, iterations);
+            Thread.sleep(30*1000);
             getMovies(client, 10000, iterations);
+            Thread.sleep(30*1000);
             getMovies(client, 100000, iterations);
 
             transport.close();
@@ -71,6 +74,8 @@ public class BlockingClient {
             e.printStackTrace();
         } catch (TException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -78,7 +83,7 @@ public class BlockingClient {
         transport.close();
     }
 
-    private void getMovies(MovieService.Client client, int count, int iterations) throws TException {
+    private void getMovies(MovieService.Client client, int count, int iterations) throws TException, InterruptedException {
         info("#### BLOCKING REQUEST ####  {0} CALLS ####", count);
         long totalElapsed = 0;
         for (int j=0; j<iterations; j++) {
@@ -91,6 +96,7 @@ public class BlockingClient {
             long duration = end - start;
             totalElapsed += duration;
             logTransmissionTime(duration);
+            Thread.sleep(10*1000);
         }
         info("AVERAGE transmission time: {0}", totalElapsed/(float)iterations);
     }

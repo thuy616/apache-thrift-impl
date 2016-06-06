@@ -5,6 +5,7 @@ import movieservice.Movies;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.AsyncMethodCallback;
 import org.apache.thrift.async.TAsyncClientManager;
+import org.apache.thrift.async.TAsyncMethodCall;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TNonblockingSocket;
 import org.apache.thrift.transport.TTransportException;
@@ -16,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Scanner;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -76,34 +78,12 @@ public class AsyncClient {
         }
     }
 
-
-    private class GetMoviesMethodCallback implements AsyncMethodCallback<Movies> {
-
-        @Override
-        public void onComplete(Movies getMovies_call) {
-//            info("onComplete{0}", getMovies_call);
-
-            try {
-                Movies re = getMovies_call;
-                info("!!!!!!!!callback oncomplete invoked...");
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "error", e);
-            }
-        }
-
-        @Override
-        public void onError(Exception e) {
-            e.printStackTrace();
-            logger.log(Level.SEVERE, "callback error", e);
-        }
-    }
-
     public AsyncClient(int port) throws IOException {
         transportSocket = new TNonblockingSocket("127.0.0.1", port);
         asyncClientManager = new TAsyncClientManager();
         asyncClient = new MovieService.AsyncClient(new TBinaryProtocol.Factory(), asyncClientManager, transportSocket);
 
-        executor = Executors.newFixedThreadPool(200);
+        executor = Executors.newFixedThreadPool(1000);
 
         SimpleDateFormat format = new SimpleDateFormat("MM_dd_yyyy_HHmmss");
         try {
@@ -126,55 +106,71 @@ public class AsyncClient {
         logger.addHandler(fh);
     }
 
+    private static abstract class FutureLessCallback<T> implements AsyncMethodCallback<T> {
+        @Override
+        public void onError(Exception e) {
+            logger.log(Level.SEVERE, "RPC FAILED!", e);
+        }
+    }
 
-    public void invoke(int count) throws TException {
-        long start = System.nanoTime();
-        for (int i = 0; i < count; i++) {
-            Runnable task = new Runnable() {
-                public void run() { // Where the "do the call" code sits
+    private long basicCall(MovieService.AsyncClient client, int count) throws Exception {
+        long totalElapsed = 0;
+        for (int i=0; i<count; i++) {
+            final int currentCount = i;
+            final CountDownLatch latch = new CountDownLatch(1);
+            final AtomicBoolean returned = new AtomicBoolean(false);
+            long start = System.nanoTime();
+            client.getMovies(new FutureLessCallback<Movies>() {
 
-                    try {
-//                        asyncClient.getMovies(new GetMoviesMethodCallback());
-                        WaitableCallback<Movies> callback =
-                                new WaitableCallback<Movies>() {
-
-                                    @Override
-                                    public void onComplete(Movies res) {
-                                        try {
-                                            // consume result from callback
-                                            info("onComplete: received result for task: " + counter.incrementAndGet());
-                                        } catch (Exception e) {
-                                            logger.log(Level.SEVERE, "EXCEPTION", e);
-                                        } finally {
-                                            complete();
-                                        }
-                                    }
-                                };
-                        // make async call
-//                        callback.reset();
-                        asyncClient.getMovies(callback);
-//                        info("Client getMovies() executes async");
-//                        callback.wait(500);
-                    } catch (TException e) {
-                        e.printStackTrace();
-                    }
+                @Override
+                public void onComplete(Movies movies) {
+                    returned.set(true);
+                    latch.countDown();
                 }
 
-            };
-            executor.submit(task);
-            System.out.println("Task submitted #" + i);
+                @Override
+                public void onError(Exception e) {
+                    try {
+                        logger.log(Level.SEVERE, "RPC FAILED!", e);
+                    } finally {
+                        latch.countDown();
+                    }
+                }
+            });
+            long end = System.nanoTime();
+            totalElapsed += end - start;
+            boolean calledBack = latch.await(100, TimeUnit.SECONDS);
+            info("if called back on count: {0}: {1}", currentCount, calledBack);
+            info("if result is returned on count {0}: {1}", currentCount, returned.get());
         }
-        long end = System.nanoTime();
-        long submissionTime = end - start;
-        logTransmissionTime(count, submissionTime);
+        return totalElapsed;
+    }
 
-        // wait for all futures to complete before sending new sets of request
+    public void runAsyncTests(int count, int iterations) throws Exception {
+        long totalTime = 0;
+        for (int i=0; i<iterations; i++) {
+            totalTime += basicCall(asyncClient, count);
+            Thread.sleep(10000);
+        }
+        info("AVERAGE time for {0} ASYNC calls after {1} iterations: {2}", count, iterations, totalTime/(float)iterations);
     }
 
     public void shutdown() {
         info("Shutting down...");
         asyncClientManager.stop();
         transportSocket.close();
+        executor.shutdown();
+        try {
+            info("awaiting executor termination...");
+            boolean grace = executor.awaitTermination(60*2, TimeUnit.SECONDS);
+            if (grace) {
+                info("shutdown gracefully");
+            } else {
+                info("termination time out!!!");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void info(String msg, Object... params) {
@@ -188,6 +184,7 @@ public class AsyncClient {
 
     public static void main(String[] args) {
         int port = 9090; // use with non-blocking server
+
         AsyncClient client = null;
         try {
             client = new AsyncClient(port);
@@ -195,17 +192,26 @@ public class AsyncClient {
             e.printStackTrace();
         }
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Press any key to continue.. q to quit...");
-        while (scanner.nextLine() != "q") {
-            System.out.println("Number of calls:");
-            int count = scanner.nextInt();
+
+
+            System.out.println("Number of iterations:");
+            int iterations = scanner.nextInt();
 
             try {
 
                 info("TESTING");
 //                client.invoke(count);
-                client.invoke(count);
-
+                info("IGNORE -- Handshaking requests ------------------- ");
+                client.runAsyncTests(1, 1);
+                info("IGNORE -- END Handshing --------------------");
+                client.runAsyncTests(1, iterations);
+                Thread.sleep(30*1000);
+                client.runAsyncTests(1000, iterations);
+                Thread.sleep(30*1000);
+                client.runAsyncTests(10000, iterations);
+                Thread.sleep(30*1000);
+                client.runAsyncTests(100000, 1);
+                Thread.sleep(30*1000*3);
 
             } catch (TException e) {
                 e.printStackTrace();
@@ -214,7 +220,7 @@ public class AsyncClient {
                 e.printStackTrace();
                 logger.log(Level.SEVERE, "Unknown general Exception", e);
             }
-        }
+        client.shutdown();
 
     }
 }

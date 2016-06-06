@@ -39,7 +39,7 @@ if __name__ == '__main__':
     logger.addHandler(fh)
     logger.addHandler(ch)
 
-    handler = movie_service_impl.MovieServiceAsyncHandler()
+    handler = movie_service_impl.MovieServiceHandler()
 
     processor = MovieService.Processor(handler)
     # processor = Ping.Processor(handler)

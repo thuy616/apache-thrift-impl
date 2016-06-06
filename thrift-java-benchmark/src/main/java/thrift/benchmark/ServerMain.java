@@ -8,7 +8,7 @@ import java.util.logging.Level;
  * Created by thuy on 22/05/16.
  */
 public class ServerMain {
-    
+
     public static void main(String[] args) {
         try {
             int mode = 1; // default blocking server
